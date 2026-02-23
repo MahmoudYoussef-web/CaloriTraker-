@@ -14,32 +14,34 @@ public class CustomUserDetailsService
     private final UserRepository userRepo;
 
     @Override
-    public UserDetails loadUserByUsername(String email)
+    public UserDetails loadUserByUsername(String identifier)
             throws UsernameNotFoundException {
 
-        User user = userRepo.findByEmail(email)
+        User user = userRepo
+                .findByEmailOrUsername(identifier, identifier)
                 .orElseThrow(() ->
                         new UsernameNotFoundException("User not found")
                 );
 
-        return buildUserDetails(user);
+        return build(user);
     }
 
-    public UserDetails loadUserById(Long id)
-            throws UsernameNotFoundException {
+
+    public UserDetails loadUserById(Long id) {
 
         User user = userRepo.findById(id)
                 .orElseThrow(() ->
                         new UsernameNotFoundException("User not found")
                 );
 
-        return buildUserDetails(user);
+        return build(user);
     }
 
-    private UserDetails buildUserDetails(User user) {
+
+    private UserDetails build(User user) {
 
         return org.springframework.security.core.userdetails.User
-                .withUsername(user.getEmail())
+                .withUsername(user.getUsername())
                 .password(user.getPassword())
                 .authorities("USER")
                 .build();

@@ -11,6 +11,7 @@ public class AuthMapper {
 
         return new AuthResponse(
                 user.getId(),
+                user.getUsername(),
                 user.getEmail(),
                 token
         );

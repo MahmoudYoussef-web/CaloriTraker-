@@ -6,6 +6,7 @@ import com.caloriestracker.system.dto.response.auth.AuthResponse;
 import com.caloriestracker.system.entity.User;
 import com.caloriestracker.system.exception.BadRequestException;
 import com.caloriestracker.system.exception.UnauthorizedException;
+import com.caloriestracker.system.mapper.AuthMapper;
 import com.caloriestracker.system.repository.UserRepository;
 import com.caloriestracker.system.service.security.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -17,47 +18,29 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 public class AuthServiceImpl implements AuthService {
-
     private final UserRepository userRepo;
     private final PasswordEncoder encoder;
     private final JwtService jwtService;
-
-    @Override
-    public AuthResponse login(LoginRequest request) {
-
-        validate(request.getEmail(), request.getPassword());
-
-        String email = request.getEmail().toLowerCase().trim();
-
-        User user = userRepo.findByEmail(email)
-                .orElseThrow(() ->
-                        new UnauthorizedException("Invalid email or password")
-                );
-
-        if (!encoder.matches(request.getPassword(), user.getPassword())) {
-            throw new UnauthorizedException("Invalid email or password");
-        }
-
-        return buildResponse(user);
-    }
+    private final AuthMapper authMapper;
 
     @Override
     public AuthResponse register(RegisterRequest request) {
 
-        validate(request.getEmail(), request.getPassword());
-
-        if (request.getFullName() == null || request.getFullName().isBlank()) {
-            throw new BadRequestException("Full name is required");
-        }
-
         String email = request.getEmail().toLowerCase().trim();
+        String username = request.getUsername().toLowerCase().trim();
 
         if (userRepo.existsByEmail(email)) {
-            throw new BadRequestException("Email already registered");
+            throw new BadRequestException("Email already used");
+        }
+
+        if (userRepo.existsByUsername(username)) {
+            throw new BadRequestException("Username already used");
         }
 
         User user = User.builder()
-                .fullName(request.getFullName().trim())
+                .firstName(request.getFirstName().trim())
+                .lastName(request.getLastName().trim())
+                .username(username)
                 .email(email)
                 .password(encoder.encode(request.getPassword()))
                 .build();
@@ -68,23 +51,29 @@ public class AuthServiceImpl implements AuthService {
     }
 
 
-    private void validate(String email, String password) {
+    @Override
+    public AuthResponse login(LoginRequest request) {
 
-        if (email == null || password == null ||
-        email.isBlank() || password.isBlank()) {
+        String identifier = request.getUsername().trim();
 
-            throw new BadRequestException("Email and password required");
+        User user = userRepo
+                .findByEmailOrUsername(identifier, identifier)
+                .orElseThrow(() ->
+                        new UnauthorizedException("Invalid credentials")
+                );
+
+        if (!encoder.matches(request.getPassword(), user.getPassword())) {
+            throw new UnauthorizedException("Invalid credentials");
         }
+
+        return buildResponse(user);
     }
+
 
     private AuthResponse buildResponse(User user) {
 
         String token = jwtService.generate(user);
 
-        return new AuthResponse(
-                user.getId(),
-                user.getEmail(),
-                token
-        );
+        return authMapper.toResponse(user, token);
     }
 }

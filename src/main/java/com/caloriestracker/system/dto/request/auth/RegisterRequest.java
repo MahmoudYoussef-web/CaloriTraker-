@@ -9,14 +9,22 @@ import lombok.Data;
 public class RegisterRequest {
 
     @NotBlank
-    @Size(min = 3, max = 150)
-    private String fullName;
+    @Size(min = 2, max = 100)
+    private String firstName;
+
+    @NotBlank
+    @Size(min = 2, max = 100)
+    private String lastName;
+
+    @NotBlank
+    @Size(min = 3, max = 100)
+    private String username;
 
     @Email
     @NotBlank
     private String email;
 
     @NotBlank
-    @Size(min = 8, message = "Password must be at least 8 characters")
+    @Size(min = 8)
     private String password;
 }

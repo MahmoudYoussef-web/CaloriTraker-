@@ -97,7 +97,10 @@ public class UserProfileServiceImpl implements UserProfileService {
 
         return new UserFullProfileResponse(
                 user.getId(),
-                user.getFullName(),
+
+                // full name
+                user.getFirstName() + " " + user.getLastName(),
+
                 user.getEmail(),
                 user.getCreatedAt(),
 

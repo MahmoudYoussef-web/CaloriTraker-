@@ -38,8 +38,8 @@ public class JwtServiceImpl implements JwtService {
         Date expiry = new Date(now.getTime() + expiration);
 
         return Jwts.builder()
-                .setSubject(user.getId().toString()) // userId
-                .claim("email", user.getEmail())
+                .setSubject(user.getId().toString())
+                .claim("username", user.getUsername())
                 .setIssuedAt(now)
                 .setExpiration(expiry)
                 .signWith(key, SignatureAlgorithm.HS256)
