@@ -8,7 +8,7 @@ public interface ImageService {
 
     Page<ImageResponse> getGallery(Long userId, Pageable pageable);
 
-    void toggleFavorite(Long imageId);
+    void toggleFavorite(Long userId, Long imageId);
 
-    void delete(Long imageId);
+    void delete(Long userId, Long imageId);
 }

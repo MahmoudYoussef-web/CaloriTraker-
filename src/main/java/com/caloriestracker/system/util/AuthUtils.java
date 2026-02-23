@@ -25,9 +25,9 @@ public class AuthUtils {
             throw new RuntimeException("Invalid principal");
         }
 
-        String email = userDetails.getUsername();
+        String username = userDetails.getUsername(); // ← ده username مش email
 
-        User user = userRepo.findByEmail(email)
+        User user = userRepo.findByUsername(username)
                 .orElseThrow(() ->
                         new RuntimeException("User not found")
                 );

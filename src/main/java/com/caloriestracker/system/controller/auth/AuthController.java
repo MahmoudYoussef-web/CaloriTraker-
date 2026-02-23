@@ -4,7 +4,8 @@ import com.caloriestracker.system.dto.request.auth.LoginRequest;
 import com.caloriestracker.system.dto.request.auth.RegisterRequest;
 import com.caloriestracker.system.dto.response.auth.AuthResponse;
 import com.caloriestracker.system.service.auth.AuthService;
-import org.springframework.http.MediaType;
+import com.caloriestracker.system.util.AuthUtils;
+
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
@@ -20,26 +21,29 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final AuthUtils authUtils;
 
-    @PostMapping(value = "/register", produces = "application/json")
+    @PostMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<AuthResponse> register(
             @Valid @RequestBody RegisterRequest request
     ) {
+
         AuthResponse response = authService.register(request);
+
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .contentType(MediaType.APPLICATION_JSON)
                 .body(response);
     }
 
-    @PostMapping(value = "/login", produces = "application/json")
+    @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<AuthResponse> login(
             @Valid @RequestBody LoginRequest request
     ) {
+
         AuthResponse response = authService.login(request);
-        return ResponseEntity
-                .ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(response);
+
+        return ResponseEntity.ok(response);
     }
+
+
 }

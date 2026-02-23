@@ -2,6 +2,7 @@ package com.caloriestracker.system.repository;
 
 import com.caloriestracker.system.dto.response.dashboard.CaloriesProgressResponse;
 import com.caloriestracker.system.entity.Meal;
+import com.caloriestracker.system.entity.MealItem;
 import com.caloriestracker.system.enums.MealType;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -33,7 +34,7 @@ public interface MealRepository extends JpaRepository<Meal, Long> {
             @Param("end") LocalDate end
     );
 
-    // Daily meals
+    // ✅ Daily meals
     List<Meal> findByUser_IdAndMealDate(
             Long userId,
             LocalDate mealDate
@@ -45,4 +46,6 @@ public interface MealRepository extends JpaRepository<Meal, Long> {
             LocalDate mealDate,
             MealType mealType
     );
+
+
 }

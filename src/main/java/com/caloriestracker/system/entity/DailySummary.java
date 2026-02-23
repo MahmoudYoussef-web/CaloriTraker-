@@ -1,8 +1,10 @@
 package com.caloriestracker.system.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
+
 import lombok.*;
 
 import java.time.LocalDate;
@@ -10,8 +12,13 @@ import java.time.LocalDate;
 @Entity
 @Table(
         name = "daily_summaries",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id","date"}),
-        indexes = @Index(name = "idx_daily_user_date", columnList = "user_id,date")
+        uniqueConstraints = @UniqueConstraint(
+                columnNames = {"user_id", "date"}
+        ),
+        indexes = @Index(
+                name = "idx_daily_user_date",
+                columnList = "user_id,date"
+        )
 )
 @Getter
 @Setter

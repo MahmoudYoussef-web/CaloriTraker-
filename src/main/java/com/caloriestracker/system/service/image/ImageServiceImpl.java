@@ -15,8 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ImageServiceImpl implements ImageService {
 
-    private final ImageRepository imageRepo;
 
+    private final ImageRepository imageRepo;
 
     @Override
     @Transactional(readOnly = true)
@@ -27,11 +27,11 @@ public class ImageServiceImpl implements ImageService {
                 .map(this::mapToResponse);
     }
 
-
     @Override
-    public void toggleFavorite(Long imageId) {
+    public void toggleFavorite(Long userId, Long imageId) {
 
-        Image image = imageRepo.findById(imageId)
+        Image image = imageRepo
+                .findByIdAndUserId(imageId, userId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Image not found")
                 );
@@ -41,11 +41,11 @@ public class ImageServiceImpl implements ImageService {
         imageRepo.save(image);
     }
 
-
     @Override
-    public void delete(Long imageId) {
+    public void delete(Long userId, Long imageId) {
 
-        Image image = imageRepo.findById(imageId)
+        Image image = imageRepo
+                .findByIdAndUserId(imageId, userId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Image not found")
                 );
@@ -60,9 +60,7 @@ public class ImageServiceImpl implements ImageService {
         response.setId(image.getId());
         response.setPath(image.getPath());
         response.setUploadedAt(image.getUploadedAt());
-
         response.setStatus(image.getStatus());
-
         response.setFavorite(image.isFavorite());
 
         if (image.getMealItem() != null) {

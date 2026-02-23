@@ -48,4 +48,5 @@ public class UserProfileController {
                 userProfileService.updateProfile(userId, request)
         );
     }
+
 }

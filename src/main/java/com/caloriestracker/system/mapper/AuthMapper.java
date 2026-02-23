@@ -8,12 +8,11 @@ import org.springframework.stereotype.Component;
 public class AuthMapper {
 
     public AuthResponse toResponse(User user, String token) {
-
-        return new AuthResponse(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                token
-        );
+        return AuthResponse.builder()
+                .userId(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .token(token)
+                .build();
     }
 }

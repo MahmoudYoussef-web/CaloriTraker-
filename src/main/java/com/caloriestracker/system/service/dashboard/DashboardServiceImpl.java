@@ -6,7 +6,9 @@ import com.caloriestracker.system.entity.*;
 import com.caloriestracker.system.exception.ResourceNotFoundException;
 import com.caloriestracker.system.repository.*;
 import com.caloriestracker.system.service.common.CalculationService;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,21 +47,15 @@ public class DashboardServiceImpl implements DashboardService {
                 profile.getActivityLevel()
         );
 
-        System.out.println("USER ID = " + userId);
-
-        deficitRepo.findAll().forEach(d -> {
-            System.out.println(
-                    "DEFICIT: user=" + d.getUser().getId() +
-                            " target=" + d.getTargetCalories()
-            );
-        });
         double target = deficitRepo.findByUserId(userId)
                 .map(UserDeficit::getTargetCalories)
                 .orElse(
                         calculationService.calculateTargetCalories(
-                                tdee, profile.getGoal()
+                                tdee,
+                                profile.getGoal()
                         )
                 );
+
         List<Meal> meals =
                 mealRepo.findByUser_IdAndMealDate(userId, date);
 
@@ -97,13 +93,19 @@ public class DashboardServiceImpl implements DashboardService {
 
         return summaryRepo
                 .findByUserIdAndDateBetweenOrderByDateAsc(
-                        userId, weekAgo, today
+                        userId,
+                        weekAgo,
+                        today
                 )
                 .stream()
                 .map(s -> new CaloriesProgressResponse(
                         s.getDate(),
-                        s.getConsumedCalories() == null ? 0 : s.getConsumedCalories(),
-                        s.getTargetCalories() == null ? 0 : s.getTargetCalories()
+                        s.getConsumedCalories() == null
+                                ? 0.0
+                                : s.getConsumedCalories(),
+                        s.getTargetCalories() == null
+                                ? 0.0
+                                : s.getTargetCalories()
                 ))
                 .toList();
     }

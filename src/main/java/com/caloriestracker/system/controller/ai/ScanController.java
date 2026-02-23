@@ -3,7 +3,6 @@ package com.caloriestracker.system.controller.ai;
 import com.caloriestracker.system.dto.response.ai.AiAnalyzeResponse;
 import com.caloriestracker.system.dto.response.ai.ImageResponse;
 import com.caloriestracker.system.enums.ImageStatus;
-import com.caloriestracker.system.exception.BadRequestException;
 import com.caloriestracker.system.service.ai.AiService;
 import com.caloriestracker.system.service.image.ImageService;
 import com.caloriestracker.system.util.AuthUtils;
@@ -12,8 +11,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,13 +34,8 @@ public class ScanController {
             @RequestPart("file") MultipartFile file
     ) {
 
-        if (file == null || file.isEmpty()) {
-            throw new BadRequestException("Image file is required");
-        }
-
-        return ResponseEntity.ok(
-                aiService.analyze(mealId, file)
-        );
+        return ResponseEntity.accepted()
+                .body(aiService.analyze(mealId, file));
     }
 
     @GetMapping("/status/{imageId}")
@@ -70,21 +63,37 @@ public class ScanController {
 
     @PatchMapping("/favorite/{imageId}")
     public ResponseEntity<Void> toggleFavorite(
-            @PathVariable Long imageId
+            @PathVariable Long imageId,
+            Authentication auth
     ) {
 
-        imageService.toggleFavorite(imageId);
+        Long userId = authUtils.getUserId(auth);
+
+        imageService.toggleFavorite(userId, imageId);
 
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{imageId}")
     public ResponseEntity<Void> deleteImage(
+            @PathVariable Long imageId,
+            Authentication auth
+    ) {
+
+        Long userId = authUtils.getUserId(auth);
+
+        imageService.delete(userId, imageId);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/retry/{imageId}")
+    public ResponseEntity<Void> retry(
             @PathVariable Long imageId
     ) {
 
-        imageService.delete(imageId);
+        aiService.retry(imageId);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.accepted().build();
     }
 }

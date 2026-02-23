@@ -9,7 +9,9 @@ import com.caloriestracker.system.exception.UnauthorizedException;
 import com.caloriestracker.system.mapper.AuthMapper;
 import com.caloriestracker.system.repository.UserRepository;
 import com.caloriestracker.system.service.security.JwtService;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,10 +20,13 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 public class AuthServiceImpl implements AuthService {
+
     private final UserRepository userRepo;
     private final PasswordEncoder encoder;
     private final JwtService jwtService;
     private final AuthMapper authMapper;
+
+    // ================= REGISTER =================
 
     @Override
     public AuthResponse register(RegisterRequest request) {
@@ -50,11 +55,18 @@ public class AuthServiceImpl implements AuthService {
         return buildResponse(user);
     }
 
+    // ================= LOGIN =================
 
     @Override
     public AuthResponse login(LoginRequest request) {
 
-        String identifier = request.getUsername().trim();
+        String rawIdentifier = request.getIdentifier();
+
+        if (rawIdentifier == null || rawIdentifier.isBlank()) {
+            throw new BadRequestException("Username or email is required");
+        }
+
+        String identifier = rawIdentifier.trim();
 
         User user = userRepo
                 .findByEmailOrUsername(identifier, identifier)
@@ -69,6 +81,7 @@ public class AuthServiceImpl implements AuthService {
         return buildResponse(user);
     }
 
+    // ================= HELPER =================
 
     private AuthResponse buildResponse(User user) {
 

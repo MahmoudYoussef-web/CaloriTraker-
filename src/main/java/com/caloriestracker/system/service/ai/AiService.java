@@ -8,5 +8,9 @@ public interface AiService {
 
     AiAnalyzeResponse analyze(Long mealId, MultipartFile file);
 
+    void processAsync(Long imageId, MultipartFile file);
+
+    void retry(Long imageId);
+
     ImageStatus getStatus(Long imageId);
 }
