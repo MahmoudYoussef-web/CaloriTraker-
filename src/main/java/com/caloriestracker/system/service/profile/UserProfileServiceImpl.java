@@ -1,6 +1,7 @@
 package com.caloriestracker.system.service.profile;
 
 import com.caloriestracker.system.dto.request.profile.UserProfileRequest;
+import com.caloriestracker.system.dto.response.profile.UserFullProfileResponse;
 import com.caloriestracker.system.dto.response.profile.UserProfileResponse;
 import com.caloriestracker.system.entity.User;
 import com.caloriestracker.system.entity.UserProfile;
@@ -25,7 +26,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     @Transactional(readOnly = true)
     public UserProfileResponse getProfile(Long userId) {
 
-        UserProfile profile = profileRepo.findByUserId(userId)
+        UserProfile profile = profileRepo.findByUser_Id(userId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Profile not found")
                 );
@@ -75,5 +76,38 @@ public class UserProfileServiceImpl implements UserProfileService {
 
         if (r.getAge() < 1 || r.getAge() > 120)
             throw new BadRequestException("Invalid age");
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserFullProfileResponse getFullProfile(Long userId) {
+
+        User user = userRepo.findById(userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found")
+                );
+
+        UserProfile profile = profileRepo.findByUser_Id(userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Profile not found")
+                );
+
+        double daily =
+                profileMapper.toResponse(profile).getDailyCalories();
+
+        return new UserFullProfileResponse(
+                user.getId(),
+                user.getFullName(),
+                user.getEmail(),
+                user.getCreatedAt(),
+
+                profile.getGender(),
+                profile.getAge(),
+                profile.getHeightCm(),
+                profile.getWeightKg(),
+                profile.getGoal(),
+                profile.getActivityLevel(),
+                daily
+        );
     }
 }

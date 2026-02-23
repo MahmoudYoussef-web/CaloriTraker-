@@ -28,6 +28,9 @@ public class User {
     @EqualsAndHashCode.Include
     private Long id;
 
+    @Column(nullable = false, length = 150)
+    private String fullName;
+
     @Column(nullable = false, unique = true, length = 150)
     private String email;
 

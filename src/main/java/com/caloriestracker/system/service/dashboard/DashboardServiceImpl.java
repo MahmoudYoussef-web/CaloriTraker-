@@ -45,6 +45,14 @@ public class DashboardServiceImpl implements DashboardService {
                 profile.getActivityLevel()
         );
 
+        System.out.println("USER ID = " + userId);
+
+        deficitRepo.findAll().forEach(d -> {
+            System.out.println(
+                    "DEFICIT: user=" + d.getUser().getId() +
+                            " target=" + d.getTargetCalories()
+            );
+        });
         double target = deficitRepo.findByUserId(userId)
                 .map(UserDeficit::getTargetCalories)
                 .orElse(
@@ -52,7 +60,6 @@ public class DashboardServiceImpl implements DashboardService {
                                 tdee, profile.getGoal()
                         )
                 );
-
         List<Meal> meals =
                 mealRepo.findByUser_IdAndMealDate(userId, date);
 

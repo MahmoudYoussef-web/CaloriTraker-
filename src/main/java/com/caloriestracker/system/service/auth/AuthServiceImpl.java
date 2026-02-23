@@ -46,6 +46,10 @@ public class AuthServiceImpl implements AuthService {
 
         validate(request.getEmail(), request.getPassword());
 
+        if (request.getFullName() == null || request.getFullName().isBlank()) {
+            throw new BadRequestException("Full name is required");
+        }
+
         String email = request.getEmail().toLowerCase().trim();
 
         if (userRepo.existsByEmail(email)) {
@@ -53,6 +57,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         User user = User.builder()
+                .fullName(request.getFullName().trim())
                 .email(email)
                 .password(encoder.encode(request.getPassword()))
                 .build();

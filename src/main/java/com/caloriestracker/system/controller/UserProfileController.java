@@ -1,6 +1,7 @@
 package com.caloriestracker.system.controller;
 
 import com.caloriestracker.system.dto.request.profile.UserProfileRequest;
+import com.caloriestracker.system.dto.response.profile.UserFullProfileResponse;
 import com.caloriestracker.system.dto.response.profile.UserProfileResponse;
 import com.caloriestracker.system.service.profile.UserProfileService;
 import com.caloriestracker.system.util.AuthUtils;
@@ -21,18 +22,20 @@ public class UserProfileController {
     private final UserProfileService userProfileService;
     private final AuthUtils authUtils;
 
+    // GET FULL PROFILE (Account + Health)
     @GetMapping
-    public ResponseEntity<UserProfileResponse> getProfile(
+    public ResponseEntity<UserFullProfileResponse> getProfile(
             Authentication authentication
     ) {
 
         Long userId = authUtils.getUserId(authentication);
 
         return ResponseEntity.ok(
-                userProfileService.getProfile(userId)
+                userProfileService.getFullProfile(userId)
         );
     }
 
+    // UPDATE HEALTH DATA
     @PutMapping
     public ResponseEntity<UserProfileResponse> updateProfile(
             @Valid @RequestBody UserProfileRequest request,

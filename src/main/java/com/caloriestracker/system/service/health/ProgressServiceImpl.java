@@ -5,11 +5,13 @@ import com.caloriestracker.system.dto.response.dashboard.CaloriesProgressRespons
 import com.caloriestracker.system.exception.BadRequestException;
 import com.caloriestracker.system.repository.MealRepository;
 
+import com.caloriestracker.system.service.deficit.DeficitService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -17,14 +19,15 @@ import java.util.List;
 public class ProgressServiceImpl implements ProgressService {
 
     private final MealRepository mealRepository;
+    private final DeficitService deficitService;
 
     @Override
     public List<CaloriesProgressResponse> getCalories(Long userId) {
 
         return mealRepository.findCaloriesProgress(
                 userId,
-                java.time.LocalDate.now().minusDays(6),
-                java.time.LocalDate.now()
+                LocalDate.now().minusDays(6),
+                LocalDate.now()
         );
     }
 
@@ -32,17 +35,6 @@ public class ProgressServiceImpl implements ProgressService {
     @Transactional
     public void setDeficit(Long userId, CalorieDeficitRequest request) {
 
-        if (request.getMaintenanceCalories() <= 0) {
-            throw new BadRequestException("Maintenance calories must be positive");
-        }
-
-        if (request.getDeficit() < 0) {
-            throw new BadRequestException("Deficit cannot be negative");
-        }
-
-        if (request.getDeficit() > request.getMaintenanceCalories()) {
-            throw new BadRequestException("Deficit cannot exceed maintenance calories");
-        }
-
+        deficitService.setDeficit(userId, request);
     }
 }

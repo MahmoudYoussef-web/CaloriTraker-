@@ -4,7 +4,6 @@ import com.caloriestracker.system.entity.User;
 import org.springframework.stereotype.Service;
 
 
-@Service
 public interface JwtService {
 
     String generate(User user);

@@ -12,12 +12,16 @@ import com.caloriestracker.system.service.common.CalculationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class DeficitServiceImpl implements DeficitService {
 
+    @PersistenceContext
+    private EntityManager em;
     private final UserRepository userRepo;
     private final UserProfileRepository profileRepo;
     private final UserDeficitRepository deficitRepo;
@@ -32,7 +36,7 @@ public class DeficitServiceImpl implements DeficitService {
                         new ResourceNotFoundException("User not found")
                 );
 
-        UserProfile profile = profileRepo.findByUserId(userId)
+        UserProfile profile = profileRepo.findByUser_Id(userId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Profile not found")
                 );
@@ -52,18 +56,10 @@ public class DeficitServiceImpl implements DeficitService {
 
         double deficitValue = request.getDeficit().doubleValue();
 
-        double target = tdee - deficitValue;
-
         UserDeficit deficit = deficitRepo
-                .findByUser(user)
+                .findByUserId(userId)
                 .orElse(UserDeficit.builder()
                         .user(user)
                         .build());
-
-        deficit.setMaintenanceCalories(tdee);
-        deficit.setDeficitCalories(deficitValue);
-        deficit.setTargetCalories(target);
-
-        deficitRepo.save(deficit);
     }
 }

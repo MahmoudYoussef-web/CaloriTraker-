@@ -15,5 +15,9 @@ public interface UserProfileRepository
 
     Optional<UserProfile> findByUserId(Long userId);
 
+    Optional<UserProfile> findByUser_Id(Long userId);
+
     boolean existsByUserId(Long userId);
+
+
 }
